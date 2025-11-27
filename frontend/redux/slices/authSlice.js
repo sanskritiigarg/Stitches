@@ -5,6 +5,21 @@ import axios from 'axios';
 const userFromStorage = localStorage.getItem('userInfo')
   ? JSON.parse(localStorage.getItem('userInfo'))
   : null;
+let currUser = null;
+
+if (userFromStorage) {
+  const EXPIRY_TIME = 40 * 24 * 60 * 60 * 1000;
+  const loginTime = userFromStorage.loginTime;
+  const now = Date.now();
+
+  if (now - loginTime < EXPIRY_TIME) {
+    currUser = userFromStorage;
+  } else {
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('userToken');
+    currUser = null;
+  }
+}
 
 // Check for an exisitng guest ID in the localStorage or generate a new one
 const initialGuestId = localStorage.getItem('guestId') || `guest_${new Date().getTime()}`;
@@ -12,7 +27,7 @@ localStorage.setItem('guestId', initialGuestId);
 
 // Initial State
 const initialState = {
-  user: userFromStorage,
+  user: currUser,
   guestId: initialGuestId,
   loading: false,
   error: null,
@@ -28,10 +43,11 @@ export const loginUser = createAsyncThunk(
         userData,
       );
 
-      localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+      const userWithTime = { ...response.data.user, loginTime: Date.now() };
+      localStorage.setItem('userInfo', JSON.stringify(userWithTime));
       localStorage.setItem('userToken', response.data.token);
 
-      return response.data.user;
+      return userWithTime;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -48,10 +64,11 @@ export const registerUser = createAsyncThunk(
         userData,
       );
 
-      localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+      const userWithTime = { ...response.data.user, loginTime: Date.now() };
+      localStorage.setItem('userInfo', JSON.stringify(userWithTime));
       localStorage.setItem('userToken', response.data.token);
 
-      return response.data.user;
+      return userWithTime;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
