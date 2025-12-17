@@ -201,7 +201,7 @@ const ProductDetails = ({ productId }) => {
             <div className="lg:w-1/2 lg:ml-10">
               <h1 className="text-2xl md:text-3xl font-semibold mb-2">{selectedProduct.name}</h1>
               {selectedProduct.rating && (
-                <div className="flex border w-32 p-1 mb-2 rounded items-center">
+                <div className="flex border w-40 p-1 mb-2 rounded items-center">
                   <FaStar className="h-4 w-4 p-0.5"></FaStar>
                   <p className="pr-2 mr-2 border-r">{selectedProduct.rating.toFixed(1)}</p>
                   <p>{selectedProduct.numRatings} ratings</p>
